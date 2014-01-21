@@ -1,21 +1,20 @@
 # TODO
 # - check py3 tests, are they ran?
-# - rename to python-markdown (after current python-markdown) is trashed
 
 # Conditional build:
 %bcond_without	tests	# do not perform "make test"
 %bcond_without	py3	# do not build python3 package
 
-%define		srcname	Markdown
+%define 	module	markdown
 Summary:	Markdown implementation in Python
-Name:		python-Markdown
+Name:		python-%{module}
 Version:	2.2.1
-Release:	1
+Release:	2
 License:	BSD
 Group:		Development/Languages/Python
-URL:		http://packages.python.org/Markdown/
-Source0:	http://pypi.python.org/packages/source/M/%{srcname}/%{srcname}-%{version}.tar.gz
+Source0:	http://pypi.python.org/packages/source/M/Markdown/Markdown-%{version}.tar.gz
 # Source0-md5:	9e002c8051fb346cae75060f3302048a
+URL:		http://packages.python.org/Markdown/
 BuildRequires:	python-devel
 BuildRequires:	python-elementtree
 BuildRequires:	python-nose
@@ -28,7 +27,8 @@ BuildRequires:	python3-nose
 BuildRequires:	python-2to3
 %endif
 Requires:	python-elementtree
-Obsoletes:	python-markdown = 2.2.1
+Provides:	python-Markdown = %{version}-%{release}
+Obsoletes:	python-Markdown = 2.2.1
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -49,7 +49,7 @@ there are a few known issues.
 %prep
 # install does not support --build-base. so create two different trees
 %setup -qc
-mv %{srcname}-%{version} py2
+mv Markdown-%{version} py2
 cd py2
 
 # remove shebangs
