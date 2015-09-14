@@ -8,12 +8,12 @@
 %define 	module	markdown
 Summary:	Markdown implementation in Python
 Name:		python-%{module}
-Version:	2.2.1
-Release:	5
+Version:	2.6.2
+Release:	1
 License:	BSD
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/M/Markdown/Markdown-%{version}.tar.gz
-# Source0-md5:	9e002c8051fb346cae75060f3302048a
+# Source0-md5:	256d19afcc564dc4ce4c229bb762f7ae
 URL:		http://packages.python.org/Markdown/
 BuildRequires:	python-devel
 BuildRequires:	python-elementtree
