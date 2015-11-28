@@ -63,11 +63,11 @@ cp -a py2 py3
 
 %build
 cd py2
-%{__python} setup.py build
+%py_build
 
 %if %{with py3}
 cd ../py3
-%{__python3} setup.py build
+%py3_build
 %endif
 
 %if %{with tests}
@@ -86,9 +86,7 @@ cd ../py3
 rm -rf $RPM_BUILD_ROOT
 # somewhy --build-base not supported in install
 cd py2
-%{__python} setup.py install \
-	--optimize=2 \
-	--skip-build \
+%py_install \
 	--root $RPM_BUILD_ROOT
 
 %py_postclean
@@ -98,9 +96,7 @@ mv $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py_ver}}
 
 %if %{with py3}
 cd ../py3
-%{__python3} setup.py install \
-	--optimize=2 \
-	--skip-build \
+%py3_install \
 	--root $RPM_BUILD_ROOT
 
 # rename binary
