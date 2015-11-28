@@ -9,7 +9,7 @@
 Summary:	Markdown implementation in Python
 Name:		python-%{module}
 Version:	2.6.2
-Release:	1
+Release:	2
 License:	BSD
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/M/Markdown/Markdown-%{version}.tar.gz
