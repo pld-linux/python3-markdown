@@ -19,7 +19,7 @@ BuildRequires:	python-devel
 BuildRequires:	python-elementtree
 BuildRequires:	python-nose
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.219
+BuildRequires:	rpmbuild(macros) >= 1.710
 %if %{with py3}
 BuildRequires:	python3-devel
 BuildRequires:	python3-nose
