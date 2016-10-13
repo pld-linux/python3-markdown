@@ -1,9 +1,8 @@
-# TODO
-# - check py3 tests, are they ran?
 #
 # Conditional build:
 %bcond_without	tests	# do not perform "make test"
-%bcond_without	python3	# do not build python3 package
+%bcond_without	python2	# python2 package
+%bcond_without	python3	# python3 package
 
 %define 	module	markdown
 Summary:	Markdown implementation in Python 2
@@ -65,10 +64,7 @@ Pythonie 3. Jest prawie całkowicie zgodna z implementacją wzorcową,
 choć jest kilka znanych problemów.
 
 %prep
-# install does not support --build-base. so create two different trees
-%setup -qc
-%{__mv} Markdown-%{version} py2
-cd py2
+%setup -q -n Markdown-%{version}
 
 # remove shebangs
 find markdown -type f -name '*.py' -exec sed -i -e '/^#!/{1D}' {} ';'
@@ -76,65 +72,58 @@ find markdown -type f -name '*.py' -exec sed -i -e '/^#!/{1D}' {} ';'
 # fix line-ending
 %undos docs/release-2.2.0.txt
 
-cd ..
-cp -a py2 py3
-
 %build
-cd py2
+%if %{with python2}
 %py_build
 
-%if %{with python3}
-cd ../py3
-%py3_build
+%if %{with tests}
+%{__python} ./run-tests.py
+%endif
 %endif
 
-%if %{with tests}
-cd ../py2
-%{__python} ./run-tests.py
-
 %if %{with python3}
-cd ../py3
+%py3_build
+
+%if %{with tests}
 %{__python3} ./run-tests.py
 %endif
 %endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
-# somewhy --build-base not supported in install
-cd py2
-%py_install
-
-%py_postclean
-
-# rename binary
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py_ver}}
 
 %if %{with python3}
-cd ../py3
 %py3_install
-
 # rename binary
 %{__mv} $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py3_ver}}
 %endif
 
+%if %{with python2}
+%py_install
+%py_postclean
+# rename binary
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py_ver}}
 # 2.X binary is called by default for now
 ln -s markdown_py-%{py_ver} $RPM_BUILD_ROOT%{_bindir}/markdown_py
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%if %{with python2}
 %files
 %defattr(644,root,root,755)
-%doc py2/{LICENSE.md,README.md} py2/docs/*
+%doc LICENSE.md README.md docs/{authors.txt,change_log.txt,cli.txt,index.txt,reference.txt,release-*.txt,siteindex.txt,extensions}
 %attr(755,root,root) %{_bindir}/markdown_py
 %attr(755,root,root) %{_bindir}/markdown_py-%{py_ver}
 %{py_sitescriptdir}/markdown
 %{py_sitescriptdir}/Markdown-%{version}-py*.egg-info
+%endif
 
 %if %{with python3}
 %files -n python3-markdown
 %defattr(644,root,root,755)
-%doc py3/{LICENSE.md,README.md} py3/docs/*
+%doc LICENSE.md README.md docs/{authors.txt,change_log.txt,cli.txt,index.txt,reference.txt,release-*.txt,siteindex.txt,extensions}
 %attr(755,root,root) %{_bindir}/markdown_py-%{py3_ver}
 %{py3_sitescriptdir}/markdown
 %{py3_sitescriptdir}/Markdown-%{version}-py*.egg-info
