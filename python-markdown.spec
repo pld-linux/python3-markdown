@@ -1,30 +1,37 @@
 # TODO
 # - check py3 tests, are they ran?
-
+#
 # Conditional build:
 %bcond_without	tests	# do not perform "make test"
-%bcond_without	py3	# do not build python3 package
+%bcond_without	python3	# do not build python3 package
 
 %define 	module	markdown
-Summary:	Markdown implementation in Python
+Summary:	Markdown implementation in Python 2
+Summary(pl.UTF-8):	Implementacja formatu Markdown w Pythonie 2
 Name:		python-%{module}
-Version:	2.6.2
-Release:	2
+Version:	2.6.7
+Release:	1
 License:	BSD
 Group:		Development/Languages/Python
-Source0:	http://pypi.python.org/packages/source/M/Markdown/Markdown-%{version}.tar.gz
-# Source0-md5:	256d19afcc564dc4ce4c229bb762f7ae
-URL:		http://packages.python.org/Markdown/
+#Source0Download: https://pypi.python.org/simple/markdown/
+Source0:	https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-%{version}.tar.gz
+# Source0-md5:	a06f1c5d462b32e0e8da014e9eebb0d9
+URL:		https://pythonhosted.org/Markdown/
 BuildRequires:	python-devel
 BuildRequires:	python-elementtree
+%if %{with tests}
+BuildRequires:	python-PyYAML
 BuildRequires:	python-nose
+%endif
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.710
-%if %{with py3}
-BuildRequires:	python3-devel
+BuildRequires:	rpmbuild(macros) >= 1.714
+BuildRequires:	sed >= 4.0
+%if %{with python3}
+BuildRequires:	python3-devel >= 1:3.2
+%if %{with tests}
+BuildRequires:	python3-PyYAML
 BuildRequires:	python3-nose
-# for converting before running the tests:
-BuildRequires:	python-2to3
+%endif
 %endif
 Requires:	python-elementtree
 Provides:	python-Markdown = %{version}-%{release}
@@ -33,30 +40,41 @@ BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-This is a Python implementation of John Gruber's Markdown. It is
+This is a Python 2 implementation of John Gruber's Markdown. It is
 almost completely compliant with the reference implementation, though
 there are a few known issues.
 
+%description -l pl.UTF-8
+Ten pakiet zawiera implementację formatu Markdown Johna Grubera w
+Pythonie 2. Jest prawie całkowicie zgodna z implementacją wzorcową,
+choć jest kilka znanych problemów.
+
 %package -n python3-markdown
-Summary:	Markdown implementation in Python
+Summary:	Markdown implementation in Python 3
+Summary(pl.UTF-8):	Implementacja formatu Markdown w Pythonie 3
 Group:		Development/Languages/Python
 
 %description -n python3-markdown
-This is a Python implementation of John Gruber's Markdown. It is
+This is a Python 3 implementation of John Gruber's Markdown. It is
 almost completely compliant with the reference implementation, though
 there are a few known issues.
+
+%description -n python3-markdown -l pl.UTF-8
+Ten pakiet zawiera implementację formatu Markdown Johna Grubera w
+Pythonie 3. Jest prawie całkowicie zgodna z implementacją wzorcową,
+choć jest kilka znanych problemów.
 
 %prep
 # install does not support --build-base. so create two different trees
 %setup -qc
-mv Markdown-%{version} py2
+%{__mv} Markdown-%{version} py2
 cd py2
 
 # remove shebangs
 find markdown -type f -name '*.py' -exec sed -i -e '/^#!/{1D}' {} ';'
 
 # fix line-ending
-sed -i 's/\r//' docs/release-2.2.0.txt
+%undos docs/release-2.2.0.txt
 
 cd ..
 cp -a py2 py3
@@ -65,20 +83,18 @@ cp -a py2 py3
 cd py2
 %py_build
 
-%if %{with py3}
+%if %{with python3}
 cd ../py3
 %py3_build
 %endif
 
 %if %{with tests}
 cd ../py2
-./run-tests.py
+%{__python} ./run-tests.py
 
-%if %{with py3}
+%if %{with python3}
 cd ../py3
-2to3 -d -w -n markdown tests run-tests.py > /dev/null
-# FIXME: run-tests.py shebang points to python2, is that correct?
-./run-tests.py
+%{__python3} ./run-tests.py
 %endif
 %endif
 
@@ -86,21 +102,19 @@ cd ../py3
 rm -rf $RPM_BUILD_ROOT
 # somewhy --build-base not supported in install
 cd py2
-%py_install \
-	--root $RPM_BUILD_ROOT
+%py_install
 
 %py_postclean
 
 # rename binary
-mv $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py_ver}}
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py_ver}}
 
-%if %{with py3}
+%if %{with python3}
 cd ../py3
-%py3_install \
-	--root $RPM_BUILD_ROOT
+%py3_install
 
 # rename binary
-mv $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py3_ver}}
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py3_ver}}
 %endif
 
 # 2.X binary is called by default for now
@@ -111,17 +125,17 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc py2/docs/*
+%doc py2/{LICENSE.md,README.md} py2/docs/*
 %attr(755,root,root) %{_bindir}/markdown_py
 %attr(755,root,root) %{_bindir}/markdown_py-%{py_ver}
 %{py_sitescriptdir}/markdown
 %{py_sitescriptdir}/Markdown-%{version}-py*.egg-info
 
-%if %{with py3}
+%if %{with python3}
 %files -n python3-markdown
 %defattr(644,root,root,755)
-%doc py3/docs/*
+%doc py3/{LICENSE.md,README.md} py3/docs/*
 %attr(755,root,root) %{_bindir}/markdown_py-%{py3_ver}
-%{py3_sitescriptdir}/Markdown-%{version}-py*.egg-info
 %{py3_sitescriptdir}/markdown
+%{py3_sitescriptdir}/Markdown-%{version}-py*.egg-info
 %endif
