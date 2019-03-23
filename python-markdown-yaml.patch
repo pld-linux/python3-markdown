@@ -1,0 +1,68 @@
+diff --git a/markdown/__main__.py b/markdown/__main__.py
+index 38d08fe0..43e486c9 100644
+--- a/markdown/__main__.py
++++ b/markdown/__main__.py
+@@ -26,9 +26,17 @@
+ import warnings
+ import markdown
+ try:
+-    import yaml
++    # We use `unsafe_load` because users may need to pass in actual Python
++    # objects. As this is only available from the CLI, the user has much
++    # worse problems if an attacker can use this as an attach vector.
++    from yaml import unsafe_load as yaml_load
+ except ImportError:  # pragma: no cover
+-    import json as yaml
++    try:
++        # Fall back to PyYAML <5.1
++        from yaml import load as yaml_load
++    except ImportError:
++        # Fall back to JSON
++        from json import load as yaml_load
+ 
+ import logging
+ from logging import DEBUG, WARNING, CRITICAL
+@@ -97,7 +105,7 @@ def parse_options(args=None, values=None):
+             options.configfile, mode="r", encoding=options.encoding
+         ) as fp:
+             try:
+-                extension_configs = yaml.load(fp)
++                extension_configs = yaml_load(fp)
+             except Exception as e:
+                 message = "Failed parsing extension config file: %s" % \
+                           options.configfile
+--- a/tests/__init__.py.orig	2018-01-05 01:41:13.000000000 +0100
++++ b/tests/__init__.py	2019-03-22 22:41:00.850729644 +0100
+@@ -17,13 +17,16 @@
+ except ImportError:
+     tidylib = None
+ try:
+-    import yaml
+-except ImportError as e:
+-    msg = e.args[0]
+-    msg = msg + ". A YAML library is required to run the Python-Markdown " \
+-        "tests. Run `pip install pyyaml` to install the latest version."
+-    e.args = (msg,) + e.args[1:]
+-    raise
++    from yaml import unsafe_load as yaml_load
++except ImportError: # PyYAML < 5.1
++    try:
++        from yaml import load as yaml_load
++    except ImportError as e:
++        msg = e.args[0]
++        msg = msg + ". A YAML library is required to run the Python-Markdown " \
++            "tests. Run `pip install pyyaml` to install the latest version."
++        e.args = (msg,) + e.args[1:]
++        raise
+ 
+ test_dir = os.path.abspath(os.path.dirname(__file__))
+ 
+@@ -36,7 +39,7 @@
+         self._config = {}
+         if os.path.exists(filename):
+             with codecs.open(filename, encoding="utf-8") as f:
+-                self._config = yaml.load(f)
++                self._config = yaml_load(f)
+ 
+     def get(self, section, option):
+         """ Get config value for given section and option key. """
