@@ -9,7 +9,7 @@ Summary:	Markdown implementation in Python 2
 Summary(pl.UTF-8):	Implementacja formatu Markdown w Pythonie 2
 Name:		python-%{module}
 Version:	2.6.11
-Release:	1
+Release:	2
 License:	BSD
 Group:		Development/Languages/Python
 #Source0Download: https://pypi.python.org/simple/markdown/
