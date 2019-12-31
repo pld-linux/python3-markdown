@@ -12,19 +12,17 @@ Version:	2.6.11
 Release:	2
 License:	BSD
 Group:		Development/Languages/Python
-#Source0Download: https://pypi.python.org/simple/markdown/
+#Source0Download: https://pypi.org/simple/markdown/
 Source0:	https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-%{version}.tar.gz
 # Source0-md5:	a67c1b2914f7d74eeede2ebe0fdae470
 Patch0:		%{name}-yaml.patch
-URL:		https://pythonhosted.org/Markdown/
+URL:		https://pypi.org/project/markdown/
 BuildRequires:	python-devel
 BuildRequires:	python-elementtree
 %if %{with tests}
 BuildRequires:	python-PyYAML
 BuildRequires:	python-nose
 %endif
-BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.714
 %if %{with python3}
 BuildRequires:	python3-devel >= 1:3.2
 %if %{with tests}
@@ -32,9 +30,11 @@ BuildRequires:	python3-PyYAML
 BuildRequires:	python3-nose
 %endif
 %endif
+BuildRequires:	rpm-pythonprov
+BuildRequires:	rpmbuild(macros) >= 1.714
 Requires:	python-elementtree
 Provides:	python-Markdown = %{version}-%{release}
-Obsoletes:	python-Markdown = 2.2.1
+Obsoletes:	python-Markdown < 2.3
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
