@@ -19,7 +19,6 @@ Source0:	https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-%{ve
 URL:		https://pypi.org/project/markdown/
 %if %{with python2}
 BuildRequires:	python-devel >= 1:2.7
-BuildRequires:	python-elementtree
 BuildRequires:	python-setuptools >= 36
 %if %{with tests}
 BuildRequires:	python-PyYAML
@@ -34,7 +33,6 @@ BuildRequires:	python3-PyYAML
 %endif
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
-Requires:	python-elementtree
 Provides:	python-Markdown = %{version}-%{release}
 Obsoletes:	python-Markdown < 2.3
 BuildArch:	noarch
