@@ -52,6 +52,7 @@ choć jest kilka znanych problemów.
 Summary:	Markdown implementation in Python 3
 Summary(pl.UTF-8):	Implementacja formatu Markdown w Pythonie 3
 Group:		Development/Languages/Python
+Conflicts:	python-markdown < 3
 
 %description -n python3-markdown
 This is a Python 3 implementation of John Gruber's Markdown. It is
