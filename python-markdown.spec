@@ -1,5 +1,6 @@
 #
 # Conditional build:
+%bcond_with	doc	# documentation
 %bcond_without	tests	# unit tests
 %bcond_without	python2	# python2 package
 %bcond_without	python3	# python3 package
@@ -8,26 +9,27 @@
 Summary:	Markdown implementation in Python 2
 Summary(pl.UTF-8):	Implementacja formatu Markdown w Pythonie 2
 Name:		python-%{module}
-Version:	2.6.11
-Release:	2
+Version:	3.1.1
+Release:	1
 License:	BSD
 Group:		Development/Languages/Python
 #Source0Download: https://pypi.org/simple/markdown/
 Source0:	https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-%{version}.tar.gz
-# Source0-md5:	a67c1b2914f7d74eeede2ebe0fdae470
-Patch0:		%{name}-yaml.patch
+# Source0-md5:	d84732ecc65b3a1bff693d9d4c24277f
 URL:		https://pypi.org/project/markdown/
-BuildRequires:	python-devel
+%if %{with python2}
+BuildRequires:	python-devel >= 1:2.7
 BuildRequires:	python-elementtree
+BuildRequires:	python-setuptools >= 36
 %if %{with tests}
 BuildRequires:	python-PyYAML
-BuildRequires:	python-nose
+%endif
 %endif
 %if %{with python3}
-BuildRequires:	python3-devel >= 1:3.2
+BuildRequires:	python3-devel >= 1:3.5
+BuildRequires:	python3-setuptools >= 36
 %if %{with tests}
 BuildRequires:	python3-PyYAML
-BuildRequires:	python3-nose
 %endif
 %endif
 BuildRequires:	rpm-pythonprov
@@ -65,14 +67,13 @@ choć jest kilka znanych problemów.
 
 %prep
 %setup -q -n Markdown-%{version}
-%patch0 -p1
 
 %build
 %if %{with python2}
 %py_build
 
 %if %{with tests}
-%{__python} ./run-tests.py
+%{__python} -m unittest discover tests
 %endif
 %endif
 
@@ -80,26 +81,32 @@ choć jest kilka znanych problemów.
 %py3_build
 
 %if %{with tests}
-%{__python3} ./run-tests.py
+%{__python3} -m unittest discover tests
 %endif
+%endif
+
+%if %{with doc}
+mkdocs
+mkdocs_nature
 %endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
+%if %{with python2}
+%py_install
+
+%py_postclean
+# rename binary
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py_ver}}
+%endif
+
 %if %{with python3}
 %py3_install
 # rename binary
 %{__mv} $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py3_ver}}
-%endif
-
-%if %{with python2}
-%py_install
-%py_postclean
-# rename binary
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/markdown_py{,-%{py_ver}}
-# 2.X binary is called by default for now
-ln -s markdown_py-%{py_ver} $RPM_BUILD_ROOT%{_bindir}/markdown_py
+# default binary
+ln -s markdown_py-%{py3_ver} $RPM_BUILD_ROOT%{_bindir}/markdown_py
 %endif
 
 %clean
@@ -109,7 +116,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc LICENSE.md README.md docs/{change_log,extensions,authors.md,cli.md,favicon.ico,index.md,py.png,reference.md}
-%attr(755,root,root) %{_bindir}/markdown_py
 %attr(755,root,root) %{_bindir}/markdown_py-%{py_ver}
 %{py_sitescriptdir}/markdown
 %{py_sitescriptdir}/Markdown-%{version}-py*.egg-info
@@ -119,6 +125,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n python3-markdown
 %defattr(644,root,root,755)
 %doc LICENSE.md README.md docs/{change_log,extensions,authors.md,cli.md,favicon.ico,index.md,py.png,reference.md}
+%attr(755,root,root) %{_bindir}/markdown_py
 %attr(755,root,root) %{_bindir}/markdown_py-%{py3_ver}
 %{py3_sitescriptdir}/markdown
 %{py3_sitescriptdir}/Markdown-%{version}-py*.egg-info
