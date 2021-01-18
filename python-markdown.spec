@@ -31,6 +31,10 @@ BuildRequires:	python3-setuptools >= 36
 BuildRequires:	python3-PyYAML
 %endif
 %endif
+%if %{with doc}
+BuildRequires:	python-mkdocs >= 1.0
+BuildRequires:	python-mkdocs-nature
+%endif
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
 Provides:	python-Markdown = %{version}-%{release}
