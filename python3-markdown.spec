@@ -16,7 +16,7 @@ Source0:	https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-%{ve
 # Source0-md5:	034e3bccfde211d44b4a7a69cb290ba0
 URL:		https://pypi.org/project/markdown/
 BuildRequires:	python3-devel >= 1:3.6
-BuildRequires:	python3-setuptools >= 36.6
+BuildRequires:	python3-setuptools >= 1:36.6
 %if %{with tests}
 BuildRequires:	python3-PyYAML
 %if "%{py3_ver}" <= "3.8"
