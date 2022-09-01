@@ -7,15 +7,15 @@
 Summary:	Markdown implementation in Python 3
 Summary(pl.UTF-8):	Implementacja formatu Markdown w Pythonie 3
 Name:		python3-%{module}
-Version:	3.3.4
-Release:	3
+Version:	3.4.1
+Release:	1
 License:	BSD
 Group:		Development/Languages/Python
 #Source0Download: https://pypi.org/simple/markdown/
 Source0:	https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-%{version}.tar.gz
-# Source0-md5:	b6833c6326e9164ee0c662218a75e7f0
+# Source0-md5:	597656cf4feadf1998b0511201620202
 URL:		https://pypi.org/project/markdown/
-BuildRequires:	python3-devel >= 1:3.6
+BuildRequires:	python3-devel >= 1:3.7
 BuildRequires:	python3-setuptools >= 1:36.6
 %if %{with tests}
 BuildRequires:	python3-PyYAML
